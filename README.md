@@ -1,3 +1,6 @@
+<img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=150&section=header" />
+
+
 # 구글 플레이스토어 웹 리뷰 크롤러
 Notion | https://www.notion.so/yimsebin/08288af861a94970ac98e8e4693fe2e6?pvs=4
 
@@ -7,10 +10,11 @@ Notion | https://www.notion.so/yimsebin/08288af861a94970ac98e8e4693fe2e6?pvs=4
 파일 업로드.
 
 ## 🎨 코드 설명
-#### 초기세팅
-1. 라이브러리 설치하기
+#### 라이브러리 설치하기
+```python
 !pip install selenium
 !pip install pandas
+```
 
 #### '리뷰 모두 보기' 버튼 클릭
 ```python
@@ -80,3 +84,5 @@ data.reset_index(inplace=True, drop=True)
 - https://blog-of-gon.tistory.com/324
 - https://velog.io/@devmin/selenium-crawling-infinite-scroll-click
 - https://velog.io/@parkeu/youtubeshorts
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=BDBDC8&height=150&section=footer" />
