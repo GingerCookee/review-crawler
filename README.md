@@ -2,7 +2,7 @@
 
 
 # 구글 플레이스토어 웹 리뷰 크롤러
-Notion | https://www.notion.so/yimsebin/08288af861a94970ac98e8e4693fe2e6?pvs=4
+Notion | https://www.notion.so/yimsebin/3c08c1c6c604439fad301c28df80bb41?pvs=4
 
 
 ## 🚧 Update LOG
