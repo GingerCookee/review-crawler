@@ -6,7 +6,7 @@ import re
 
 # headless
 options = webdriver.ChromeOptions()
-options.add_argument("--headless=new")
+#options.add_argument("--headless=new")
 options.add_argument('window-size=1920x1080')
 # user agent
 options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36")
@@ -15,10 +15,11 @@ options.add_argument("disable-gpu")
 # chromedriver
 driver = webdriver.Chrome(options=options)
 
-raw_data = {"https://play.google.com/store/apps/details?id=com.miHoYo.GenshinImpact&hl=ko_KR" : "원신",
-"https://play.google.com/store/apps/details?id=com.abocado.eggplant&hl=ko&gl=US" : "생존법사: 로그라이크 게임",
+raw_data = {
 "https://play.google.com/store/apps/details?id=com.superjoy.idleheroes&hl=ko&gl=US" : "용사단 키우기",
 "https://play.google.com/store/apps/details?id=com.superbox.aos.herowave&hl=ko&gl=US" : "히어로 원정대 : 키우기 방치형 RPG",
+"https://play.google.com/store/apps/details?id=com.miHoYo.GenshinImpact&hl=ko_KR" : "원신",
+"https://play.google.com/store/apps/details?id=com.abocado.eggplant&hl=ko&gl=US" : "생존법사: 로그라이크 게임",
 "https://play.google.com/store/apps/details?id=com.Romanbard.Jumo&hl=ko&gl=US" : "주모 키우기! - 조선시대 방치형 클리커",
 "https://play.google.com/store/apps/details?id=com.neowiz.game.mok&hl=ko&gl=US" : "마스터 오브 나이츠",
 "https://play.google.com/store/apps/details?id=com.patterncorp.yokai&hl=ko&gl=US" : "캣앤나이츠 : 사무라이 블레이드",
@@ -38,13 +39,14 @@ raw_data = {"https://play.google.com/store/apps/details?id=com.miHoYo.GenshinImp
 "https://play.google.com/store/apps/details?id=net.cravemob.zeus&hl=ko-KR": "리벤저 사가"}
 
 URLS = list(raw_data.keys())
+APPNAMES = list(raw_data.values())
 
-for URL in URLS :
+for URL, NAME in zip(URLS, APPNAMES) :
 
     # Load Page
     # chrome을 띄워 토스 구글플레이 페이지를 킨다.
     driver.get(url=URL)
-
+    print(f"{NAME} 스크롤 시작")
 
     # 최하단으로 스크롤내리기
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -52,8 +54,8 @@ for URL in URLS :
     spread_review = driver.find_element(by=By.XPATH, value = '/html/body/c-wiz[2]/div/div/div[1]/div/div[2]/div/div[1]/div[1]/c-wiz[5]/section/div/div[2]/div[5]/div/div/button')
     isTrue = spread_review.is_displayed()
     if isTrue :
-        #driver.execute_script("arguments[0].click();", spread_review)
-        spread_review.click()
+        driver.execute_script("arguments[0].click();", spread_review)
+        #spread_review.click()
         time.sleep(1.5)
 
 
@@ -77,6 +79,7 @@ for URL in URLS :
 
         last_height = new_height
 
+    print(f"{NAME} 데이터 수집 시작")
 
     data = pd.DataFrame(data=[], columns=['날짜','리뷰','별점'])
     #날짜, 리뷰, 별점 수집
@@ -86,18 +89,31 @@ for URL in URLS :
 
 
     # 수집한 리뷰를 DataFrame에 삽입
-    for i in range(len(reviews)):
+    for i in range(max(len(dates), len(reviews), len(stargrades))) :
         tmp = []
-        tmp.append(dates[i].text)
-        tmp.append(reviews[i].text)
-        tmp.append(stargrades[i].get_attribute('aria-label'))
+        if i < len(dates) :
+            tmp.append(dates[i].text)
+        else :
+            tmp.append("")
+
+        if i < len(reviews) :
+            tmp.append(reviews[i].text)
+        else :
+            tmp.append("")
+
+        if i < len(stargrades) :
+            tmp.append(stargrades[i].get_attribute('aria-label'))
+        else :
+            tmp.append("")
 
         tmp = pd.DataFrame(data=[tmp], columns = data.columns)
         data = pd.concat([data,tmp])
 
+
     # 인덱스 재배열
     data.reset_index(inplace=True, drop=True)
 
+    print(f"{NAME} 파일 추출")
 
     # 별점에서 숫자만 추출
     data['별점'] = data['별점'].apply(lambda x : x[5:])
@@ -105,6 +121,6 @@ for URL in URLS :
     data['별점'] = data['별점'].apply(lambda x : m.findall(x)[0])
 
     # 엑셀 파일로 추출
-    data.to_excel('reviews.xlsx')
+    data.to_excel(f'review_{NAME}.xlsx')
 
-    driver.close()
+driver.close()
