@@ -1,12 +1,15 @@
 from selenium import webdriver
+from selenium.webdriver import ActionChains
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 import time
 import pandas as pd
 import re
 
 # headless
 options = webdriver.ChromeOptions()
-options.add_argument("--headless=new")
+# options.add_argument("--headless=new")
 options.add_argument('window-size=1920x1080')
 # user agent
 options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36")
@@ -35,9 +38,8 @@ for URL in URLS :
     # chrome을 띄워 토스 구글플레이 페이지를 킨다.
     driver.get(url=URL)
 
-
-    # 최하단으로 스크롤내리기
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    # '더보기' 버튼을 담은 div까지 스크롤내리기
+    driver.execute_script("window.scrollTo({top:document.querySelector(\".ver-wrap\").offsetTop});")
     # 더보기 클릭
     spread_review = driver.find_element(by=By.XPATH, value = '/html/body/div[3]/div[1]/div[4]/ul/li[31]/div')
     isTrue = spread_review.is_displayed()
@@ -46,55 +48,84 @@ for URL in URLS :
         spread_review.click()
         time.sleep(1.5)
 
+    update_list = driver.find_elements(by=By.XPATH, value = '//a[@class=\"ver_download_link\"]')
+    div_height = 70
 
-    # 리뷰 팝업창 element
-    all_reviews = driver.find_element(by=By.XPATH, value ='/html/body/div[4]/div[2]/div/div/div/div/div[2]')
-    # 현재 리뷰 팝업창 height 구하기
-    last_height = driver.execute_script("return arguments[0].scrollHeight", all_reviews)
-    # last_height = driver.execute_script("return document.getElementsByClassName('odk6He')[0].scrollHeight")
+    # 스크롤 위치
+    driver.execute_script("window.scrollTo({top:document.querySelector(\".ver_content_box\").offsetTop});")
+    for i, cur_update in enumerate(update_list) :
+        action = ActionChains(driver)
+        cur_update = driver.find_element(by=By.XPATH, value='/html/body/div[3]/div[1]/div[4]/ul/li[%s]/a' %str(i+1))
+        action = action.move_to_element(cur_update)
+        div_height *= i
+        driver.execute_script("window.scrollBy(0, %i);" %div_height)
 
-    while True :
-        # 현재 height만큼 스크롤
-        driver.execute_script(f'arguments[0].scrollTop = {last_height}', all_reviews)
-        time.sleep(1)   # 로드 기다리는 시간
+        time.sleep(3)
+        action = action.click().perform()
 
-        new_height = driver.execute_script("return arguments[0].scrollHeight", all_reviews)
-        # new_height = driver.execute_script("return document.getElementsByClassName('odk6He')[0].scrollHeight")
+        isAd = True
+        while isAd :
+            try :
+                ad_div = driver.find_element(By.ID, 'ad_position_box')
+                driver.refresh()
+            except :
+                isAd = False
+            
+        driver.back()
+        time.sleep(3)
+        driver.execute_script("window.scrollTo({top:document.querySelector(\".ver_content_box\").offsetTop + %i});" %div_height)
 
-        # 스크롤을 진행했는데도 이전 height와 스크롤 이후 height가 같으면 더이상 로드할 데이터가 없다는 뜻이므로 스크롤 중단
-        if new_height == last_height :
-            break
+    time.sleep(4)
 
-        last_height = new_height
-
-
-    data = pd.DataFrame(data=[], columns=['날짜','리뷰','별점'])
-    #날짜, 리뷰, 별점 수집
-    dates = driver.find_elements(by=By.XPATH, value = '//div[@class="odk6He"]//span[@class="bp9Aid"]')
-    reviews=driver.find_elements(by=By.XPATH, value = '//div[@class="odk6He"]//div[@class="h3YV2d"]')
-    stargrades = driver.find_elements(by=By.XPATH, value = '//div[@class="odk6He"]//div[@class="iXRFPc"]')
-
-
-    # 수집한 리뷰를 DataFrame에 삽입
-    for i in range(len(reviews)):
-        tmp = []
-        tmp.append(dates[i].text)
-        tmp.append(reviews[i].text)
-        tmp.append(stargrades[i].get_attribute('aria-label'))
-
-        tmp = pd.DataFrame(data=[tmp], columns = data.columns)
-        data = pd.concat([data,tmp])
-
-    # 인덱스 재배열
-    data.reset_index(inplace=True, drop=True)
+    # # 리뷰 팝업창 element
+    # all_reviews = driver.find_element(by=By.XPATH, value ='/html/body/div[4]/div[2]/div/div/div/div/div[2]')
+    # # 현재 리뷰 팝업창 height 구하기
+    # last_height = driver.execute_script("return arguments[0].scrollHeight", all_reviews)
+    # # last_height = driver.execute_script("return document.getElementsByClassName('odk6He')[0].scrollHeight")
 
 
-    # 별점에서 숫자만 추출
-    data['별점'] = data['별점'].apply(lambda x : x[5:])
-    m = re.compile('[0-9][\.0-9]*') # 정규표현식
-    data['별점'] = data['별점'].apply(lambda x : m.findall(x)[0])
+    # while True :
+    #     # 현재 height만큼 스크롤
+    #     driver.execute_script(f'arguments[0].scrollTop = {last_height}', all_reviews)
+    #     time.sleep(1)   # 로드 기다리는 시간
 
-    # 엑셀 파일로 추출
-    data.to_excel('reviews.xlsx')
+    #     new_height = driver.execute_script("return arguments[0].scrollHeight", all_reviews)
+    #     # new_height = driver.execute_script("return document.getElementsByClassName('odk6He')[0].scrollHeight")
 
-    driver.close()
+    #     # 스크롤을 진행했는데도 이전 height와 스크롤 이후 height가 같으면 더이상 로드할 데이터가 없다는 뜻이므로 스크롤 중단
+    #     if new_height == last_height :
+    #         break
+
+    #     last_height = new_height
+
+
+    # data = pd.DataFrame(data=[], columns=['날짜','리뷰','별점'])
+    # #날짜, 리뷰, 별점 수집
+    # dates = driver.find_elements(by=By.XPATH, value = '//div[@class="odk6He"]//span[@class="bp9Aid"]')
+    # reviews=driver.find_elements(by=By.XPATH, value = '//div[@class="odk6He"]//div[@class="h3YV2d"]')
+    # stargrades = driver.find_elements(by=By.XPATH, value = '//div[@class="odk6He"]//div[@class="iXRFPc"]')
+
+
+    # # 수집한 리뷰를 DataFrame에 삽입
+    # for i in range(len(reviews)):
+    #     tmp = []
+    #     tmp.append(dates[i].text)
+    #     tmp.append(reviews[i].text)
+    #     tmp.append(stargrades[i].get_attribute('aria-label'))
+
+    #     tmp = pd.DataFrame(data=[tmp], columns = data.columns)
+    #     data = pd.concat([data,tmp])
+
+    # # 인덱스 재배열
+    # data.reset_index(inplace=True, drop=True)
+
+
+    # # 별점에서 숫자만 추출
+    # data['별점'] = data['별점'].apply(lambda x : x[5:])
+    # m = re.compile('[0-9][\.0-9]*') # 정규표현식
+    # data['별점'] = data['별점'].apply(lambda x : m.findall(x)[0])
+
+    # # 엑셀 파일로 추출
+    # data.to_excel('reviews.xlsx')
+
+    # driver.close()
