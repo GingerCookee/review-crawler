@@ -4,6 +4,17 @@ import time
 import pandas as pd
 import re
 
+def main() :
+    # 파일명
+    file_name = 'application_list.xlsx'
+
+    # Daraframe형식으로 엑셀 파일 읽기
+    df = pd.read_excel(file_name)
+
+
+if __name__ == '__main__' :
+    main()
+
 # headless
 options = webdriver.ChromeOptions()
 options.add_argument("--headless=new")
@@ -15,28 +26,8 @@ options.add_argument("disable-gpu")
 # chromedriver
 driver = webdriver.Chrome(options=options)
 
-raw_data = {
-"https://play.google.com/store/apps/details?id=com.superjoy.idleheroes&hl=ko&gl=US" : "용사단 키우기",
-"https://play.google.com/store/apps/details?id=com.superbox.aos.herowave&hl=ko&gl=US" : "히어로 원정대-키우기 방치형 RPG",
-"https://play.google.com/store/apps/details?id=com.miHoYo.GenshinImpact&hl=ko_KR" : "원신",
-"https://play.google.com/store/apps/details?id=com.abocado.eggplant&hl=ko&gl=US" : "생존법사-로그라이크 게임",
-"https://play.google.com/store/apps/details?id=com.Romanbard.Jumo&hl=ko&gl=US" : "주모 키우기 - 조선시대 방치형 클리커",
-"https://play.google.com/store/apps/details?id=com.neowiz.game.mok&hl=ko&gl=US" : "마스터 오브 나이츠",
-"https://play.google.com/store/apps/details?id=com.patterncorp.yokai&hl=ko&gl=US" : "캣앤나이츠-사무라이 블레이드",
-"https://play.google.com/store/apps/details?id=com.albiononline&hl=ko-KR": "알비온 온라인",
-"https://play.google.com/store/apps/details?id=com.HoYoverse.hkrpgoversea&hl=ko-KR" : "붕괴-스타레일",
-"https://play.google.com/store/apps/details?id=com.asobimo.toramonline&hl=ko-KR":  "RPG 토람 온라인",
-"https://play.google.com/store/apps/details?id=com.com2us.smon.normal.freefull.google.kr.android.common&hl=ko-KR": "서머너즈 워-천공의 아레나",
-"https://play.google.com/store/apps/details?id=com.tapas.heroesrestaurant&hl=ko-KR": "용사식당",
-"https://play.google.com/store/apps/details?id=com.pearlabyss.blackdesertm&hl=ko-KR": "검은사막 모바일",
-"https://play.google.com/store/apps/details?id=studio.gameberry.idlehunter&hl=ko_KR" : "헌터 키우기",
-"https://play.google.com/store/apps/details?id=com.gear2.growslayer&hl=ko_KR" : "슬레이어 키우기",
-"https://play.google.com/store/apps/details?id=com.cookapps.ShadowKnightsIdleRPG&hl=ko_KR" : "그림자 기사단",
-"https://play.google.com/store/apps/details?id=com.cookapps.berserkidle&hl=ko_KR": "광전사 키우기",
-"https://play.google.com/store/apps/details?id=com.gamepub.hab.g&hl=ko_KR":"합성소녀 키우기",
-"https://play.google.com/store/apps/details?id=com.dev3ffactory.SweetHome&hl=ko_KR":"스위트홈",
-"https://play.google.com/store/apps/details?id=com.devsisters.ck&pcampaignid=merch_published_cluster_promotion_battlestar_top_picks&hl=ko_KR" : "쿠키런 킹덤",
-"https://play.google.com/store/apps/details?id=net.cravemob.zeus&hl=ko-KR": "리벤저 사가"}
+raw_data = {}
+
 
 URLS = list(raw_data.keys())
 APPNAMES = list(raw_data.values())
