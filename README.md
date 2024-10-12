@@ -8,8 +8,30 @@ Notion | https://www.notion.so/yimsebin/3c08c1c6c604439fad301c28df80bb41?pvs=4
 ## 🚧 Update LOG
 @2024-04-04
 파일 업로드.
+@2024-10-13
+google_play_scraper 라이브러리 사용해서 코드 재구성
+
+## 📁 아키텍처
+```
+📦 REVIEW-DRAWLER
+ ├── 📂 reviewData
+ │   └─ 📄 review_{applicationName}.xlsx
+ ├── 📄 former_review_crawler.py
+ ├── 📄 review_scraper.py
+ └── 📄 update_crawler.py
+```
 
 ## 🎨 코드 설명
+### 1. review_scraper.py
+google_play_scraper 라이브러리를 사용한 크롤링 코드.
+
+| **reviewId** | **userName** | **userImage** | **content** | **score** | **thumbsUpCount** | **reviewCreatedVersion** | **at** | **replyContent** | **repliedAt** | **appVersion** |
+| :------: |  :------: |   :------: |
+| 리뷰ID | 리뷰 작성자 이름 | 리뷰 작성자 프로필사진 | 리뷰내용 | 별점 | 따봉개수 | 리뷰생성 시 버전 | 리뷰 생성 시점 | 답글내용 | 답글 생성 시점 | 어플리케이션 버전 |
+
+### 2. former_review_crawler.py
+google_play_scraper 라이브러리를 도입하기 이전 selenium으로 직접 작성했던 크롤링 코드.
+
 #### 라이브러리 설치하기
 ```python
 !pip install selenium
