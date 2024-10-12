@@ -70,7 +70,7 @@ for URL in URLS :
                 driver.refresh()
             except :
                 isAd = False
-            
+        
         driver.back()
         time.sleep(3)
         driver.execute_script("window.scrollTo({top:document.querySelector(\".ver_content_box\").offsetTop + %i});" %div_height)
