@@ -52,5 +52,5 @@ for URL, NAME in zip(URLS, APPNAMES) :
     # 인덱스 재배열
     reviewDf.reset_index(inplace=True, drop=True)
     # 파일 이름에 사용할 수 없는 특수문자 제거
-    filename = re.sub('[\/:*?"<>|]','',NAME)+'.xls'
+    filename = re.sub('[\/:*?"<>|]','',NAME)
     reviewDf.to_excel(f'review_{filename}.xlsx')
