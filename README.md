@@ -24,7 +24,11 @@ google_play_scraper 라이브러리 사용해서 코드 재구성
 ## 🎨 코드 설명
 ### 1. review_scraper.py
 google_play_scraper 라이브러리를 사용한 크롤링 코드.
-
+|제목|내용|설명|
+|------|---|---|
+|테스트1|테스트2|테스트3|
+|테스트1|테스트2|테스트3|
+|테스트1|테스트2|테스트3|
 | **reviewId** | **userName** | **userImage** | **content** | **score** | **thumbsUpCount** | **reviewCreatedVersion** | **at** | **replyContent** | **repliedAt** | **appVersion** |
 | :------: |  :------: |   :------: |
 | 리뷰ID | 리뷰 작성자 이름 | 리뷰 작성자 프로필사진 | 리뷰내용 | 별점 | 따봉개수 | 리뷰생성 시 버전 | 리뷰 생성 시점 | 답글내용 | 답글 생성 시점 | 어플리케이션 버전 |
