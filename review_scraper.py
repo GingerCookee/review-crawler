@@ -3,12 +3,8 @@ from urllib.parse import urlparse, parse_qs
 import pandas as pd
 import re
 
-isRecent = True
-
-STARTDATE = pd.Timestamp('2024-08-01T00:00:00')
+STARTDATE = pd.Timestamp('2024-07-01T00:00:00')
 ENDDATE = pd.Timestamp('2024-09-01T00:00:00')
-reviewDf = pd.DataFrame()
-token = None
 
 # 크롤링하고자 하는 어플리케이션 목록 엑셀 파일
 file_name = 'application_list.xlsx'
@@ -18,6 +14,10 @@ APPNAMES = list(application_list['어플'])
 URLS = list(application_list['링크'])
 
 for URL, NAME in zip(URLS, APPNAMES) :
+
+    isRecent = True
+    reviewDf = pd.DataFrame()
+    token = None
 
     print(f"{NAME} 스크롤 시작")
 
@@ -41,10 +41,14 @@ for URL, NAME in zip(URLS, APPNAMES) :
         token = continuation_token
 
         df = pd.DataFrame(result)
-        review_date = df.iloc[0]['at']
+
+        try:
+            review_date = df.iloc[0]['at']
+        except IndexError:
+            continue
 
         if STARTDATE <= review_date :
-            if ENDDATE >= review_date :
+            if ENDDATE > review_date :
                 reviewDf = pd.concat([reviewDf, df])
         else :
             isRecent = False
@@ -53,4 +57,4 @@ for URL, NAME in zip(URLS, APPNAMES) :
     reviewDf.reset_index(inplace=True, drop=True)
     # 파일 이름에 사용할 수 없는 특수문자 제거
     filename = re.sub('[\/:*?"<>|]','',NAME)
-    reviewDf.to_excel(f'review_{filename}.xlsx')
+    reviewDf.to_excel(f'reviewData/review_{filename}.xlsx')
